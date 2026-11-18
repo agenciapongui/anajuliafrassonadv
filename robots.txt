@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://anajuliafrassonadv.com.br/sitemap.xml
