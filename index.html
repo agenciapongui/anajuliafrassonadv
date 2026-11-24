@@ -252,13 +252,29 @@ Falar com Advogada Especialista</a>
 </a>
 <script>
 (function(){
+  var links=document.querySelectorAll('a[href*="wa.me/"]');
+
+  // 1) Origem (UTM/fbclid/gclid) anexada ao texto do WhatsApp
   var p=new URLSearchParams(location.search),k=['utm_source','utm_medium','utm_campaign','utm_content','utm_term'],o=[];
   k.forEach(function(x){var v=p.get(x);if(v)o.push(x.replace('utm_','')+': '+v);});
   if(p.get('fbclid'))o.push('fbclid');if(p.get('gclid'))o.push('gclid');
-  if(!o.length)return;
-  var tag=' [origem — '+o.join(', ')+']';
-  document.querySelectorAll('a[href*="wa.me/"]').forEach(function(a){
-    try{var u=new URL(a.href),t=u.searchParams.get('text')||'';u.searchParams.set('text',t+tag);a.href=u.toString();}catch(e){}
+  if(o.length){
+    var tag=' [origem — '+o.join(', ')+']';
+    links.forEach(function(a){
+      try{var u=new URL(a.href),t=u.searchParams.get('text')||'';u.searchParams.set('text',t+tag);a.href=u.toString();}catch(e){}
+    });
+  }
+
+  // 2) Evento de conversão no dataLayer a cada clique no WhatsApp (p/ GTM)
+  links.forEach(function(a){
+    a.addEventListener('click', function(){
+      window.dataLayer = window.dataLayer || [];
+      window.dataLayer.push({
+        event: 'whatsapp_click',
+        click_text: (a.textContent||'WhatsApp').trim().slice(0,80),
+        click_url: a.href
+      });
+    });
   });
 })();
 </script>
